@@ -1,4 +1,4 @@
-/* Madder PDF signer. Everything happens in this page: pdf.js draws the pages, pdf-lib writes the signed copy.
+/* Oxblood PDF signer. Everything happens in this page: pdf.js draws the pages, pdf-lib writes the signed copy.
  * Items are kept in DISPLAY points (the page as shown, rotation applied, scale 1) and converted to PDF user space with the
  * pdf.js viewport at export time, so rotated and offset pages need no special cases. A drawn signature is written as vector
  * strokes (no image), a typed one as Helvetica text. */

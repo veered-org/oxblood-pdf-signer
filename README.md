@@ -1,6 +1,6 @@
-# PDF Signer (Madder): sign a PDF in your browser
+# PDF Signer (Oxblood): sign a PDF in your browser
 
-Madder is a one-page PDF signer. You open a PDF, draw your signature with a mouse, trackpad or finger (or type it), click where it goes, add the date, and download the signed copy. The work happens in your browser: the document, your signature and the result are never uploaded.
+Oxblood is a one-page PDF signer. You open a PDF, draw your signature with a mouse, trackpad or finger (or type it), click where it goes, add the date, and download the signed copy. The work happens in your browser: the document, your signature and the result are never uploaded.
 
 ![The signer with a drawn signature and the date placed on a sample assignment](docs/screenshot.png)
 
@@ -20,6 +20,6 @@ It uses [pdf.js](https://mozilla.github.io/pdf.js/) to show the pages and [pdf-l
 It gives no certificate-based digital signature, keeps no audit trail and checks no identity. It puts your mark on the page, nothing more. Whether a drawn or typed electronic signature is acceptable is up to the rules that govern the document.
 
 ## Name
-Madder is the plant whose root gave the red dye of traditional red inks.
+Oxblood is the dark red of old sealing wax, the way documents were signed and sealed before ink signatures were enough.
 
 MIT License.
