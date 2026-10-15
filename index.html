@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF Signer</title>
+<meta name="description" content="Sign a PDF in your browser: draw your signature with a mouse or finger, or type an /S/ signature, place it and the date on the page, and download the signed PDF. Nothing is uploaded.">
+<!-- SITE-HEAD -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&display=swap">
+<style>
+:root{
+  --accent:#9E2A1E; --accent2:#B8382A; --hi:#C9A227; --hi-soft:#F7EDCF;
+  --ink:#1F2937; --muted:#5B6474; --line:#E1E4EA; --page:#EEF0F3; --panel:#fff;
+  --bad:#B0342B; --ok:#1E7F4F; --bar:#3A0F0A; --bar-ink:#fff;
+}
+/* BRAND-VARS */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'Lexend',Arial,sans-serif;font-size:14px;line-height:1.45;display:flex;flex-direction:column}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+.bar{background:var(--bar);color:var(--bar-ink);display:flex;align-items:center;gap:14px;padding:8px 16px;flex:none;border-bottom:3px solid var(--hi);flex-wrap:wrap}
+.bar .brand{font-weight:600;font-size:16px;white-space:nowrap}
+.bar .brand small{font-weight:300;opacity:.8;margin-left:6px}
+.bar .sp{flex:1}
+.bar a{color:var(--bar-ink);opacity:.85;text-decoration:none;font-size:13px}
+.bar a:hover{opacity:1;text-decoration:underline}
+.wrap{flex:1;display:flex;min-height:0}
+aside{width:350px;flex:none;background:var(--panel);border-right:1px solid var(--line);overflow:auto;padding:14px 16px 40px}
+aside h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:20px 0 8px;font-weight:600;display:flex;align-items:center;gap:8px}
+aside h2 .n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--accent);color:#fff;font-size:11px;letter-spacing:0}
+aside h2:first-child{margin-top:0}
+.hint{color:var(--muted);font-size:12.5px;margin:4px 0 8px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.btn{border:1.5px solid var(--accent);background:var(--accent);color:#fff;border-radius:100px;padding:6px 14px;cursor:pointer;font-weight:500;font-size:13px}
+.btn:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn.alt{background:#fff;color:var(--accent)}
+.btn.alt:hover{background:#FBF4F3}
+.btn.sm{padding:3px 10px;font-size:12px}
+.btn.big{padding:9px 20px;font-size:14px;width:100%}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.armed{background:var(--hi);border-color:var(--hi);color:#1F2937}
+select,input[type=text]{border:1px solid #C9CED8;border-radius:7px;padding:5px 8px;background:#fff;font-size:13px}
+input[type=text]{width:100%}
+label.ck{display:flex;gap:6px;align-items:center;cursor:pointer;font-size:13px}
+.drop{border:2px dashed #C3C8D2;border-radius:12px;padding:16px;text-align:center;cursor:pointer;background:#FAFBFC}
+.drop:hover{border-color:var(--accent)}
+.drop.over{border-color:var(--hi);background:var(--hi-soft)}
+.drop b{display:block;color:var(--accent);font-weight:500}
+.drop span{color:var(--muted);font-size:12px}
+.drop input{display:none}
+.fname{font-size:12.5px;color:var(--muted);word-break:break-all;margin-top:6px}
+.seg{display:inline-flex;border:1.5px solid var(--accent);border-radius:100px;overflow:hidden}
+.seg button{border:0;background:#fff;color:var(--accent);padding:5px 16px;cursor:pointer;font-weight:500;font-size:13px}
+.seg button.on{background:var(--accent);color:#fff}
+.pad{position:relative;border:1px solid #C9CED8;border-radius:10px;background:#fff;touch-action:none;margin-top:8px}
+.pad canvas{display:block;width:100%;height:150px;cursor:crosshair;border-radius:10px}
+.pad .line{position:absolute;left:16px;right:16px;bottom:34px;border-bottom:1px solid #D5D9E0;pointer-events:none}
+.pad .x{position:absolute;left:16px;bottom:38px;color:#B3B9C4;font-size:18px;pointer-events:none}
+.pad .ph{position:absolute;inset:0;display:grid;place-items:center;color:#A9AFBA;font-size:13px;pointer-events:none}
+.typed{font-family:Helvetica,Arial,sans-serif;font-size:22px;padding:12px;border:1px solid #C9CED8;border-radius:10px;margin-top:8px;min-height:56px;background:#fff;white-space:pre}
+.msg{font-size:12.5px;margin-top:6px;min-height:18px}
+.msg.bad{color:var(--bad)} .msg.ok{color:var(--ok)}
+.status{font-size:12.5px;color:var(--muted);min-height:18px;margin-top:8px}
+main{flex:1;display:flex;flex-direction:column;min-width:0}
+.view{flex:1;overflow:auto;position:relative;padding:22px 18px}
+.sheets{display:flex;flex-direction:column;align-items:center;gap:26px}
+.sheet{position:relative;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12),0 8px 24px -12px rgba(0,0,0,.25)}
+.sheet canvas{display:block;width:100%;height:100%}
+.sheet .cap{position:absolute;top:-19px;left:0;font-size:11.5px;color:var(--muted)}
+.sheet.placing{cursor:crosshair}
+.item{position:absolute;border:1.5px dashed transparent;border-radius:4px;cursor:move;touch-action:none;user-select:none}
+.item:hover,.item.sel{border-color:var(--hi)}
+.item svg{display:block;width:100%;height:100%;overflow:visible;pointer-events:none}
+.item .txt{white-space:pre;font-family:Helvetica,Arial,sans-serif;line-height:1;pointer-events:none;position:absolute;left:0;top:0}
+.item .del,.item .rs{position:absolute;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:none;place-items:center;font-size:13px;line-height:1;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.item .del{top:-12px;right:-12px}
+.item .rs{bottom:-12px;right:-12px;cursor:nwse-resize;background:var(--hi);color:#1F2937}
+.item.sel .del,.item.sel .rs,.item:hover .del,.item:hover .rs{display:grid}
+.empty{max-width:580px;margin:50px auto;text-align:center;color:var(--muted)}
+.empty h1{color:var(--ink);font-size:24px;font-weight:600;margin:0 0 10px}
+.empty ol{text-align:left;display:inline-block;margin:14px 0 0;padding-left:20px}
+.empty li{margin:5px 0}
+.foot{font-size:11.5px;color:var(--muted);margin-top:22px;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:820px){
+  .wrap{flex-direction:column}
+  aside{width:auto;border-right:0;border-bottom:1px solid var(--line);max-height:55vh}
+  .view{padding:22px 8px}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <!-- BRAND -->
+  <span class="brand">PDF Signer<small>Madder</small></span>
+  <span class="sp"></span>
+  <a href="https://github.com/veered-org/madder-pdf-signer" target="_blank" rel="noopener">Source code</a>
+  <!-- /BRAND -->
+</div>
+<div class="wrap">
+<aside>
+  <h2><span class="n">1</span>Document</h2>
+  <div class="drop" id="drop" tabindex="0">
+    <input type="file" id="file" accept="application/pdf,.pdf">
+    <b>Open the PDF to sign</b>
+    <span>It stays on your computer: nothing is uploaded.</span>
+  </div>
+  <div class="fname" id="fname"></div>
+
+  <h2><span class="n">2</span>Your signature</h2>
+  <div class="seg" id="mode"><button data-m="draw" class="on">Draw</button><button data-m="type">Type</button></div>
+  <div id="drawbox">
+    <div class="pad" id="pad"><canvas id="padc"></canvas><div class="line"></div><div class="x">&times;</div><div class="ph" id="padph">Sign here with your mouse, trackpad or finger</div></div>
+    <div class="row">
+      <button class="btn alt sm" id="undo">Undo stroke</button>
+      <button class="btn alt sm" id="clear">Clear</button>
+      <span style="flex:1"></span>
+      <label>Ink <select id="ink"><option value="#0b1f5c">Blue</option><option value="#111111">Black</option></select></label>
+    </div>
+  </div>
+  <div id="typebox" hidden>
+    <div class="row" style="margin-top:10px"><input type="text" id="typed" placeholder="/Jane Q. Inventor/" autocomplete="name" spellcheck="false"></div>
+    <label class="ck"><input type="checkbox" id="slash" checked> USPTO /S/ signature (between slashes)</label>
+    <div class="typed" id="typedprev"></div>
+    <div class="msg" id="typedmsg"></div>
+  </div>
+
+  <h2><span class="n">3</span>Place it</h2>
+  <p class="hint">Pick what to add, then click the page where it goes. Drag to move, pull the gold corner to resize, &times; to remove.</p>
+  <div class="row">
+    <button class="btn alt" id="addsig" disabled>Signature</button>
+    <button class="btn alt" id="adddate" disabled>Date</button>
+    <button class="btn alt" id="addtext" disabled>Text</button>
+  </div>
+  <div class="row" id="textrow" hidden><input type="text" id="textval" placeholder="e.g. your printed name or title"></div>
+  <div class="row"><label>Date <select id="datefmt">
+    <option value="long">October 15, 2026</option><option value="us">10/15/2026</option><option value="iso">2026-10-15</option><option value="eu">15/10/2026</option>
+  </select></label></div>
+
+  <h2><span class="n">4</span>Download</h2>
+  <label class="ck"><input type="checkbox" id="flatten" checked> Flatten fillable form fields</label>
+  <p class="hint">Locks the typed-in answers into the page, as Patent Center and most filing systems expect.</p>
+  <button class="btn big" id="save" disabled>Download the signed PDF</button>
+  <div class="status" id="status"></div>
+
+  <div class="foot">Runs entirely in your browser. The PDF, your signature and the result never leave this computer. A drawn or typed signature is an electronic signature; whether it suffices for a given document is up to the rules that govern it (for the USPTO, 37 CFR 1.4(d)).</div>
+</aside>
+<main>
+  <div class="view" id="view">
+    <div class="empty" id="empty">
+      <h1>Sign a PDF in your browser</h1>
+      <div>Draw your signature with a mouse or finger, or type it, and put it on the page.</div>
+      <ol>
+        <li>Open the PDF.</li>
+        <li>Draw or type your signature.</li>
+        <li>Click <b>Signature</b>, then click the signature line. Add the date the same way.</li>
+        <li>Download the signed PDF.</li>
+      </ol>
+      <div style="margin-top:18px"><button class="btn alt" id="demo">Try it on a sample document</button></div>
+    </div>
+    <div class="sheets" id="sheets"></div>
+  </div>
+</main>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="app.js?v=1.02"></script>
+</body>
+</html>
